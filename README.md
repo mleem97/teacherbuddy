@@ -1,43 +1,66 @@
-# _!! UNDER CONSTRUCTION !!_ Formerly known as 'Random-Student-Name Generator'. This project will undergo many changes once I find the time. It is still usable in its old form with the linked Vercel app. The repo name has already been changed to the new project name 'Teacherbuddy'. Stay tuned.
+# Teacherbuddy
 
-> The following is the old README. The README will be updated once the updated App is Live.
+**Teacherbuddy** ist ein modernes, webbasiertes Klassenbuch und Zufallsauswahl-Tool für Lehrkräfte. Es unterstützt die Verwaltung von Klassen, Schüler:innen, Anwesenheit, Beteiligung, Hausaufgaben und Gruppenbildung – alles in einer intuitiven Oberfläche. Das Projekt ist ein Fork von [teacherbuddy von mrbubbles-src](https://github.com/mrbubbles-src/teacherbuddy), ist aber stark modifiziert und umstrukturiert.
+## Features
 
-## Random-Student-Name-Generator
+- **Zufällige Namensauswahl**: Fairer, zufälliger Aufruf von Schüler:innen mit Ausschluss bereits ausgewählter Namen.
+- **Klassenbuch**: Verwaltung mehrerer Klassen, Schüler:innen, Stunden und Notizen.
+- **Anwesenheitstracker**: Markiere Schüler:innen als anwesend, abwesend oder zu spät, inkl. Notizfunktion.
+- **Beteiligungstracker**: Bewertung der mündlichen Beteiligung (1–5 Sterne) pro Stunde.
+- **Hausaufgabenmanager**: Aufgaben erstellen, Abgaben und Status pro Schüler:in verwalten.
+- **Gruppen-Generator**: Zufällige Gruppenbildung mit Constraints (z.B. „diese Namen zusammen/auseinander“), Export und Kopierfunktion.
+- **Statistiken**: Übersichtliche Auswertungen zu Anwesenheit, Beteiligung und Hausaufgaben.
+- **Import/Export**: Namen als CSV importieren/exportieren.
+- **Dark Mode**: Umschaltbar, Einstellung wird gespeichert.
+- **PWA**: Installierbar als App auf Mobilgeräten (inkl. Service Worker).
 
-## Introduction
+## Technologien
 
-When I started the Web Development course at the [Digital Career Institute](https://github.com/DigitalCareerInstitute), I quickly noticed that students (myself included) felt too shy to put their hands up when the teacher asked a question about what we had learned the previous day or when it was time to present our solutions for our afternoon assignments.
+- **Next.js** (React, App Router)
+- **TypeScript**
+- **TailwindCSS**
+- **Radix UI** Komponenten
+- **Vite** (für Tests)
+- **Vitest** (Testing)
+- **sonner** (Toasts)
+- **lucide-react** (Icons)
 
-To make things easier for the teachers to pick a student, I came up with the idea of a generator ([v1](https://github.com/mrbubbles-src/random-name-gen-v1), [v2](https://github.com/mrbubbles-src/random-name-gen-v2)) that randomly picks a student for the teacher to choose.
+## Installation & Setup
 
-This is now the final version, which I began working on just when we started with our REACT/SPA module, so please be nice about the level of code and structure I use in most of the project 😁! I promise, my code looks a lot nicer now and whenever I have the time and mental space for it, I will update the whole code to represent that and fix left-over bugs!
+1. **Repository klonen**
+   ```sh
+   git clone https://github.com/mleem97/teacherbuddy.git
+   cd teacherbuddy
+   ```
 
-Try it out! [> Click me <](https://random-student-name-generator.vercel.app/)
+2. **Abhängigkeiten installieren**
+   ```sh
+   npm install
+   ```
 
-## How to use
+3. **Entwicklungsserver starten**
+   ```sh
+   npm run dev
+   ```
+   Die App ist dann unter [http://localhost:3000](http://localhost:3000) erreichbar.
 
-### The initial setup:
+4. **Tests ausführen**
+   ```sh
+   npm run test
+   ```
 
-- Enter the names of your students **one at a time** with the input field at the top and press submit **after each name**
-  - This will save each individual student name in your **local storage**, so unless you delete that, you'll only need to do that once
-- Either press the 'Reset Generator' button or reload the page
-  - You only need to do this **once** after you've entered all names (if you add an additional name later on or clear out your local storage/delete an individual Name while on the page, you also need to press 'Reset Generator' once again). This is currently a sort-of bug that is on my to-do list
+## Nutzung
 
-### Using the Generator after the setup
+- **Klasse anlegen**: Über das Klassenmenü neue Klasse erstellen.
+- **Schüler:innen hinzufügen**: Namen einzeln oder per CSV importieren.
+- **Anwesenheit, Beteiligung, Hausaufgaben**: Pro Stunde dokumentieren.
+- **Gruppen bilden**: Im Gruppen-Tool mit/ohne Constraints Gruppen generieren.
+- **Statistiken**: Im Statistikbereich Auswertungen einsehen.
 
-- Just press the 'Generate!' button and the magic happens!
-  - The student name you generate will be crossed out in the list, so you can take a quick glance at who hasn't been chosen yet
-- Once every name is used up, the 'Generate!' button disappears and a message tells you that there are no more names. Just press the 'Reset Generator' button or reload the page, so you can start generating again
+## Autor
 
-If the unfortunate event happens that a student drops out of the course and you want to remove their name from the list, currently you need to **manually** remove the **individual** name (or clear all of course) from your local storage.
+- **mleem97** ([GitHub](https://github.com/mleem97))
 
-## On my to-do list
+## Lizenz
 
-- Option to also import a batch of student names (for example via a file)
-- Option to delete student name via input field
-  - maybe a clear all button?
-- Remove the need for a reload so that names can be reloaded
-- Dark mode! 😎
-  - With a toggle
-  - And preference saved
-- Rework app to be in line with my own current standards
+MIT
