@@ -1,14 +1,18 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import Script from 'next/script';
 import '../styles/globals.css';
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  themeColor: '#030213',
+};
 
 export const metadata: Metadata = {
   title: 'Teacherbuddy - Klassenbuch & Zufallsauswahl',
   description: 'Ein umfassendes Werkzeug für Lehrkräfte zur Klassenbuchführung und fairen Zufallsauswahl von Schüler:innen',
   keywords: ['Teacherbuddy', 'Schule', 'Unterricht', 'Zufallsauswahl', 'Namen', 'Lehrkraft', 'Klassenbuch', 'Anwesenheit'],
   authors: [{ name: 'mleem97' }],
-  viewport: 'width=device-width, initial-scale=1',
-  themeColor: '#030213',
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
@@ -44,13 +48,11 @@ export default function RootLayout({
   return (
     <html lang="de" suppressHydrationWarning>
       <head>
-        <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="apple-mobile-web-app-title" content="Teacherbuddy" />
         <meta name="format-detection" content="telephone=no" />
         <meta name="mobile-web-app-capable" content="yes" />
-        <meta name="theme-color" content="#030213" />
       </head>
       <body className="antialiased">
         {children}
