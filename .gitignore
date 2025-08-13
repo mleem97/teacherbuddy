@@ -47,4 +47,4 @@ Thumbs.db
 
 # Vitest
 vitest.config.ts.timestamp*
-node_modules
+.github/
