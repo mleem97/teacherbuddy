@@ -21,12 +21,11 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
-      { url: '/icons/icon-192x192.png', sizes: '192x192', type: 'image/png' },
-      { url: '/icons/icon-512x512.png', sizes: '512x512', type: 'image/png' },
+      { url: '/icons/icon-192x192.svg', sizes: '192x192', type: 'image/svg+xml' },
+      { url: '/icons/icon-512x512.svg', sizes: '512x512', type: 'image/svg+xml' },
     ],
     apple: [
-      { url: '/icons/icon-152x152.png', sizes: '152x152', type: 'image/png' },
-      { url: '/icons/icon-192x192.png', sizes: '192x192', type: 'image/png' },
+      { url: '/icons/icon-192x192.svg', sizes: '192x192', type: 'image/svg+xml' },
     ],
   },
   other: {
@@ -40,11 +39,7 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="de" suppressHydrationWarning>
       <head>
@@ -56,91 +51,84 @@ export default function RootLayout({
       </head>
       <body className="antialiased">
         {children}
-        
+
         {/* Service Worker Registration */}
         <Script id="sw-register" strategy="afterInteractive">
           {`
             if ('serviceWorker' in navigator) {
-              window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js')
-                  .then((registration) => {
-                    console.log('SW registered: ', registration);
-                    
-                    // Check for updates
-                    registration.addEventListener('updatefound', () => {
-                      const newWorker = registration.installing;
-                      if (newWorker) {
-                        newWorker.addEventListener('statechange', () => {
-                          if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                            // New update available
-                            if (confirm('Eine neue Version ist verfügbar. Jetzt aktualisieren?')) {
-                              newWorker.postMessage({ type: 'SKIP_WAITING' });
-                              window.location.reload();
-                            }
-                          }
-                        });
-                      }
-                    });
-                  })
-                  .catch((registrationError) => {
-                    console.log('SW registration failed: ', registrationError);
-                  });
-              });
-              
-              // Handle service worker updates
-              navigator.serviceWorker.addEventListener('controllerchange', () => {
-                window.location.reload();
+              window.addEventListener('load', function() {
+                navigator.serviceWorker.register('/sw.js').then(function(registration) {
+                  console.log('SW registered', registration);
+                }).catch(function(err) {
+                  console.log('SW registration failed', err);
+                });
               });
             }
           `}
         </Script>
 
-        {/* Install Prompt */}
+        {/* PWA Install: dezenter FAB, einmalig pro Gerät */}
         <Script id="pwa-install" strategy="afterInteractive">
           {`
-            let deferredPrompt;
-            
-            window.addEventListener('beforeinstallprompt', (e) => {
-              console.log('PWA install prompt available');
-              e.preventDefault();
-              deferredPrompt = e;
-              
-              // Show custom install button or banner
-              const installBanner = document.createElement('div');
-              installBanner.id = 'install-banner';
-              installBanner.innerHTML = \`
-                <div style="position: fixed; bottom: 20px; left: 20px; right: 20px; background: var(--primary); color: var(--primary-foreground); padding: 16px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 1000; display: flex; align-items: center; justify-content: space-between; font-size: 14px;">
-                  <span>📱 Teacherbuddy als App installieren?</span>
-                  <div>
-                    <button id="install-btn" style="background: transparent; border: 1px solid currentColor; color: inherit; padding: 8px 16px; border-radius: 4px; margin-right: 8px; cursor: pointer;">Installieren</button>
-                    <button id="dismiss-btn" style="background: transparent; border: none; color: inherit; padding: 8px; cursor: pointer;">✕</button>
-                  </div>
-                </div>
-              \`;
-              
-              document.body.appendChild(installBanner);
-              
-              document.getElementById('install-btn').addEventListener('click', () => {
-                deferredPrompt.prompt();
-                deferredPrompt.userChoice.then((result) => {
-                  console.log('PWA install result:', result);
-                  deferredPrompt = null;
-                  document.getElementById('install-banner').remove();
-                });
-              });
-              
-              document.getElementById('dismiss-btn').addEventListener('click', () => {
-                document.getElementById('install-banner').remove();
-              });
-            });
-            
-            window.addEventListener('appinstalled', (evt) => {
-              console.log('PWA was installed');
-              const banner = document.getElementById('install-banner');
-              if (banner) {
-                banner.remove();
+            (function(){
+              var LS_KEY_DISMISSED = 'teacherbuddy.pwa.install.dismissed';
+              var deferredPrompt = null;
+
+              function isStandalone(){
+                return (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) ||
+                       (('standalone' in navigator) && navigator.standalone === true);
               }
-            });
+
+              function removeFab(){
+                var el = document.getElementById('install-fab');
+                if (el) el.remove();
+              }
+
+              function showFab(){
+                if (document.getElementById('install-fab')) return;
+                if (localStorage.getItem(LS_KEY_DISMISSED) === '1') return;
+                if (isStandalone()) return;
+                if (!deferredPrompt) return;
+
+                var btn = document.createElement('button');
+                btn.id = 'install-fab';
+                btn.setAttribute('aria-label', 'App installieren');
+                btn.title = 'App installieren';
+                btn.style.cssText = 'position:fixed;bottom:16px;right:16px;width:44px;height:44px;border-radius:9999px;background:var(--primary);color:var(--primary-foreground);box-shadow:0 4px 12px rgba(0,0,0,0.15);z-index:1000;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:0.95;';
+                btn.innerHTML = '<span style="font-size:18px;line-height:1;">⬇</span>';
+                document.body.appendChild(btn);
+
+                btn.addEventListener('click', function(){
+                  try {
+                    if (deferredPrompt && deferredPrompt.prompt) {
+                      deferredPrompt.prompt();
+                      if (deferredPrompt.userChoice) {
+                        deferredPrompt.userChoice.then(function(choice){
+                          console.log('PWA install result:', choice);
+                        });
+                      }
+                    }
+                  } catch(e) {
+                    console.warn('Install prompt error', e);
+                  } finally {
+                    localStorage.setItem(LS_KEY_DISMISSED, '1');
+                    deferredPrompt = null;
+                    removeFab();
+                  }
+                });
+              }
+
+              window.addEventListener('beforeinstallprompt', function(e){
+                e.preventDefault();
+                deferredPrompt = e;
+                setTimeout(showFab, 2000);
+              });
+
+              window.addEventListener('appinstalled', function(){
+                removeFab();
+                localStorage.removeItem(LS_KEY_DISMISSED);
+              });
+            })();
           `}
         </Script>
       </body>

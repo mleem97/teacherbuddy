@@ -15,6 +15,7 @@ import { AttendanceTracker } from "./components/AttendanceTracker";
 import { ParticipationTracker } from "./components/ParticipationTracker";
 import { HomeworkManager } from "./components/HomeworkManager";
 import { ClassbookStatistics } from "./components/ClassbookStatistics";
+import { Timer } from "./components/Timer";
 import { GroupBuilder } from "./components/GroupBuilder";
 import { ClassPicker } from "./components/ClassPicker";
 import {
@@ -99,6 +100,17 @@ export default function App() {
   const currentClassStudents = students.filter(student => student.classId === currentClassId);
   const currentClassLessons = lessons.filter(lesson => lesson.classId === currentClassId);
   const currentClassHomework = homeworkAssignments.filter(hw => hw.classId === currentClassId);
+
+  // Nur Anwesende oder Zuspätkommende zählen für Beteiligung (Abwesende ausgeschlossen)
+  const participationEligibleStudents = currentClassStudents.filter(s => {
+    const rec = currentLesson.attendance.find(a => a.studentId === s.id);
+    return rec?.status !== 'absent'; // Default ohne Eintrag ist "anwesend"
+  });
+
+  // Vollständigkeit: jeder teilnahmeberechtigte Schüler hat eine Bewertung
+  const isParticipationComplete = participationEligibleStudents.every(s =>
+    currentLesson.participation.some(p => p.studentId === s.id)
+  );
 
   // Load data from localStorage on mount
   useEffect(() => {
@@ -506,6 +518,15 @@ export default function App() {
       return;
     }
 
+    // Teilnahmebewertung ist Pflicht für alle nicht-abwesenden Schüler
+    const eligibleIds = participationEligibleStudents.map(s => s.id);
+    const ratedIds = currentLesson.participation.map(p => p.studentId);
+    const missing = eligibleIds.filter(id => !ratedIds.includes(id));
+    if (missing.length > 0) {
+      // Kein Toast/Popup – UI ist bereits deaktiviert und zeigt einen dezenten Hinweis.
+      return;
+    }
+
     if (!currentLesson.endTime) {
       setCurrentLesson(prev => ({
         ...prev,
@@ -669,6 +690,7 @@ export default function App() {
                         type="file"
                         accept=".json"
                         onChange={importClassbook}
+                        aria-label="Klassenbuch aus JSON importieren"
                         className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                       />
                       <Button variant="outline" className="w-full">
@@ -710,6 +732,7 @@ export default function App() {
                   type="file"
                   accept=".json"
                   onChange={importClassbook}
+                  aria-label="Klassenbuch aus JSON importieren"
                   className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                 />
                 <Button variant="outline" size="sm">
@@ -1047,7 +1070,7 @@ export default function App() {
                 />
 
                 <ParticipationTracker
-                  students={currentClassStudents}
+                  students={participationEligibleStudents}
                   participation={currentLesson.participation}
                   onParticipationChange={(participation) =>
                     setCurrentLesson(prev => ({ ...prev, participation }))
@@ -1055,7 +1078,7 @@ export default function App() {
                 />
               </div>
 
-              <div>
+              <div className="space-y-6">
                 <Card>
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
@@ -1139,12 +1162,20 @@ export default function App() {
                       />
                     </div>
 
-                    <Button onClick={saveCurrentLesson} className="w-full" size="lg">
+                    <Button onClick={saveCurrentLesson} className="w-full" size="lg" disabled={!isParticipationComplete}>
                       <Save className="w-4 h-4 mr-2" />
                       Stunde speichern
                     </Button>
+                    {!isParticipationComplete && (
+                      <div className="text-xs text-muted-foreground mt-1 text-center">
+                        Bitte alle anwesenden/zu spät kommenden Schüler bewerten
+                      </div>
+                    )}
                   </CardContent>
                 </Card>
+
+                {/* Lesson/Break Timer */}
+                <Timer />
               </div>
             </div>
           </TabsContent>

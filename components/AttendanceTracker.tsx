@@ -95,41 +95,40 @@ export function AttendanceTracker({
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {students.map((student) => {
               const status = getStudentStatus(student.id);
+
+              const renderStatusButton = (
+                value: AttendanceStatus,
+                LabelIcon: React.ComponentType<{ className?: string }>,
+                label: string
+              ) => {
+                const isActive = status === value;
+                return (
+                  <Button
+                    key={value}
+                    size="sm"
+                    variant={isActive ? 'default' : 'outline'}
+                    onClick={() => updateAttendance(student.id, value)}
+                    className="h-7 px-2 text-xs"
+                    aria-label={label}
+                    title={label}
+                  >
+                    <LabelIcon className={isActive ? 'w-3 h-3 mr-1' : 'w-3 h-3'} />
+                    {isActive && <span>{label}</span>}
+                  </Button>
+                );
+              };
+
               return (
                 <div key={student.id} className="border rounded-lg p-3 space-y-2">
                   <div className="flex items-center justify-between">
                     <span className="font-medium">{student.name}</span>
                     {getStatusIcon(status)}
                   </div>
-                  
+
                   <div className="flex gap-1">
-                    <Button
-                      size="sm"
-                      variant={status === 'present' ? 'default' : 'outline'}
-                      onClick={() => updateAttendance(student.id, 'present')}
-                      className="h-6 px-2 text-xs"
-                    >
-                      <CheckCircle className="w-3 h-3 mr-1" />
-                      Anwesend
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant={status === 'late' ? 'default' : 'outline'}
-                      onClick={() => updateAttendance(student.id, 'late')}
-                      className="h-6 px-2 text-xs"
-                    >
-                      <Clock className="w-3 h-3 mr-1" />
-                      Zu spät
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant={status === 'absent' ? 'default' : 'outline'}
-                      onClick={() => updateAttendance(student.id, 'absent')}
-                      className="h-6 px-2 text-xs"
-                    >
-                      <UserMinus className="w-3 h-3 mr-1" />
-                      Abwesend
-                    </Button>
+                    {renderStatusButton('present', CheckCircle, 'Anwesend')}
+                    {renderStatusButton('late', Clock, 'Zu spät')}
+                    {renderStatusButton('absent', UserMinus, 'Abwesend')}
                   </div>
                 </div>
               );

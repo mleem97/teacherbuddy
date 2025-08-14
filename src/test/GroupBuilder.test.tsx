@@ -1,6 +1,7 @@
+import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { GroupBuilder } from '../components/GroupBuilder';
+import { GroupBuilder } from '../../components/GroupBuilder';
 
 const mockToast = vi.hoisted(() => ({
   success: vi.fn(),
